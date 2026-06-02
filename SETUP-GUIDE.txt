@@ -1,0 +1,394 @@
+================================================================
+   LBANK LEVERAGE AUTOTRADER — COMPLETE SETUP GUIDE
+   Do these steps IN ORDER. Don't skip ahead.
+================================================================
+
+⚠️  IMPORTANT WARNING BEFORE YOU START
+-------------------------------------------
+This bot trades with UP TO 4x LEVERAGE on futures contracts.
+With 4x leverage, a 25% price move against your position
+will result in TOTAL LOSS of that position's margin.
+
+Only deposit money you can afford to lose entirely.
+The bot has built-in safety guards (stop-loss, daily loss
+limit, liquidation guard) but no system eliminates all risk.
+
+Start small. Learn how it behaves. Scale up slowly.
+-------------------------------------------
+
+
+----------------------------------------------------------------
+PART 1: GET YOUR API KEYS (do this first, all free)
+----------------------------------------------------------------
+
+STEP 1 — Create a Telegram Bot
+--------------------------------
+1. Open Telegram
+2. Search @BotFather and open it
+3. Send:  /newbot
+4. Name it anything (e.g. LBankTrader)
+5. Username must end in "bot" (e.g. mylbanktrader_bot)
+6. BotFather sends you a token like:
+   1234567890:ABCDefGhIjKlMnOpQrStUvWxYz
+7. SAVE THIS TOKEN
+
+
+STEP 2 — Create your LBank API Key
+-------------------------------------
+This is the key the bot uses to trade on your LBank account.
+
+1. Log into your LBank account at lbank.com
+2. Click your profile icon (top right) → "My Account"
+3. Find "API Management" in the left menu
+4. Click "Create API"
+5. Give it a name: TradingBot
+6. IMPORTANT — Enable these permissions:
+     ✅ Read
+     ✅ Contract Trading (Futures)
+     ❌ Withdrawal (do NOT enable this)
+7. Complete any 2FA verification
+8. You will see:
+     API Key: (long string)
+     Secret Key: (shown ONCE — save it immediately)
+9. SAVE BOTH — the secret key cannot be retrieved again
+10. Optional but recommended: add your server IP to the
+    whitelist (Railway IP — find it in Railway → Settings)
+
+
+STEP 3 — Transfer USDT to your Futures account
+------------------------------------------------
+The bot trades in your LBank Futures wallet, not spot.
+
+1. On LBank, go to Futures section
+2. Click "Transfer" to move USDT from Spot → Futures wallet
+3. Recommended starting amount: $50-200 USDT minimum
+   (bot uses 20% per trade → at $100 that's $20 margin per trade
+    with 4x leverage = $80 notional position)
+4. You can check your futures balance with /balance in the bot
+
+
+STEP 4 — Get Telegram API ID and Hash (to read alpha channels)
+--------------------------------------------------------------
+1. Open your phone browser:  https://my.telegram.org/apps
+2. Log in with your phone number
+3. Click "API development tools"
+4. Fill in: App title = LBankBot, Short name = lbankbot, Platform = Other
+5. Click "Create application"
+6. Copy:  App api_id  and  App api_hash
+7. SAVE BOTH
+
+
+STEP 5 — Get Moralis API Key (optional but recommended)
+-------------------------------------------------------
+Adds macro sentiment signals — makes the bot smarter.
+
+1. Go to:  https://admin.moralis.io
+2. Sign up free → Web3 APIs → copy your API key
+3. SAVE IT
+
+
+----------------------------------------------------------------
+PART 2: SET UP GITHUB
+----------------------------------------------------------------
+
+STEP 6 — Create a GitHub account
+----------------------------------
+1. Go to:  https://github.com
+2. Sign up, verify email
+
+
+STEP 7 — Create a new repository
+-----------------------------------
+1. Click "+" → New repository
+2. Name it:  lbank-bot
+3. Click "Create repository"
+
+
+STEP 8 — Upload the bot files
+-------------------------------
+On iPhone:
+  1. Download:  lbank-leverage-autotrader.zip
+  2. Open Files app → tap zip to unzip it
+  3. Go to GitHub repo in Safari → "uploading an existing file"
+  4. Select all files inside the lbank-bot folder → upload
+  5. Click "Commit changes"
+
+On Chromebook:
+  1. Download and unzip:  lbank-leverage-autotrader.zip
+  2. Go to GitHub repo → "uploading an existing file"
+  3. Drag all files from inside lbank-bot folder into GitHub
+  4. Click "Commit changes"
+
+
+----------------------------------------------------------------
+PART 3: DEPLOY ON RAILWAY
+----------------------------------------------------------------
+
+STEP 9 — Create Railway account
+---------------------------------
+1. Go to:  https://railway.app
+2. Click "Login with GitHub" → authorize
+
+
+STEP 10 — Deploy the bot
+--------------------------
+1. Click "New Project" → "Deploy from GitHub repo"
+2. Select your "lbank-bot" repository
+3. Railway will build — it will likely fail first (no env vars yet)
+   That is expected
+
+
+STEP 11 — Add environment variables
+-------------------------------------
+1. Railway → your project → service box → "Variables" tab
+2. Add each variable below (click "New Variable" for each):
+
+   Variable Name           Value
+   ─────────────────────────────────────────────────────────────
+   TELEGRAM_TOKEN          paste from Step 1
+   LBANK_API_KEY           paste from Step 2
+   LBANK_API_SECRET        paste from Step 2 (secret key)
+   TG_API_ID               paste from Step 4
+   TG_API_HASH             paste from Step 4
+   TG_SESSION              leave blank for now
+   MORALIS_API_KEY         paste from Step 5 (or leave blank)
+
+   BASE_PAIRS              BTC_USDT,ETH_USDT,SOL_USDT
+   AUTO_TOP_PAIRS          5
+   MAX_LEVERAGE            100
+   DYNAMIC_LEVERAGE        true
+   LEV_TIER_1              10
+   LEV_TIER_2              25
+   LEV_TIER_3              50
+   LEV_TIER_4              75
+   LEV_TIER_5              100
+   DYNAMIC_LEVERAGE        true
+   MARGIN_PERCENT          20
+   MAX_POSITIONS           3
+   MIN_MARGIN_USDT         5
+   STOP_LOSS_PCT           3
+   TAKE_PROFIT_PCT         6
+   MAX_MARGIN_LOSS_PCT     20
+   TRAILING_STOP           true
+   TRAILING_STOP_DIST      2
+   MAX_DAILY_LOSS          50
+
+3. Railway redeploys automatically after saving
+
+
+STEP 12 — Confirm the bot is running
+--------------------------------------
+1. Railway → Deployments → look for green "Success"
+2. Click "View Logs"
+3. You should see:
+   📊 LBank Leverage AutoTrader started — 4x leverage, LONG/SHORT, 5 signal sources.
+4. If you see that, the bot is live
+
+
+----------------------------------------------------------------
+PART 4: FIRST-TIME BOT SETUP IN TELEGRAM
+----------------------------------------------------------------
+
+STEP 13 — Connect and verify your API
+---------------------------------------
+1. Open Telegram → find your bot by username
+2. Send:  /start
+3. Send:  /connect
+   The bot confirms your LBank API key is set
+4. Send:  /balance
+   You should see your USDT futures balance
+   If you get an error, double-check LBANK_API_KEY and
+   LBANK_API_SECRET are copied correctly in Railway
+
+
+STEP 14 — Start the trading engine
+------------------------------------
+1. Send:  /start_trading
+2. The bot confirms all 5 sources are starting:
+   - Price momentum (LBank ticker data)
+   - DEX Screener (market sentiment)
+   - Telegram channels (yellow until you log in)
+   - Order flow tracker (volume + price action)
+   - Moralis (macro sentiment, if key is set)
+3. Send:  /sources  to check all statuses
+4. Send:  /pairs  to see which pairs are being watched
+   (Auto-discovers top volume pairs from LBank automatically)
+
+
+STEP 15 — Authenticate Telegram channel reader (one-time)
+----------------------------------------------------------
+1. Send:  /tg_login
+2. Enter your phone number with country code (+14155552671)
+3. Enter the code Telegram sends you
+4. Bot gives you a SESSION STRING — copy it
+5. Go to Railway → Variables → add:
+   TG_SESSION = (paste the entire session string)
+6. This prevents re-login after redeploys
+
+
+STEP 16 — Add futures signal channels
+---------------------------------------
+Look for Telegram channels that post futures/leverage signals.
+Good search terms: "futures signals", "crypto futures calls",
+"BTC LONG SHORT signals", "leverage trading alerts"
+
+For each channel you want to follow:
+1. Join it yourself in Telegram first
+2. Send the bot:  /add_channel @channelname
+3. The bot watches for LONG/SHORT/BUY/SELL mentions + coin names
+4. When a signal is detected, it feeds into the consensus engine
+
+
+STEP 17 — Verify everything is working
+----------------------------------------
+1. Send:  /status
+   Engine: Active, 0 positions
+2. Send:  /sources
+   All showing green (except Telegram if not logged in, and
+   Moralis if no key provided)
+3. The bot will notify you when:
+   - Any source generates a signal (if strong enough)
+   - Multiple sources agree → consensus reached
+   - A position opens (LONG or SHORT)
+   - Stop-loss, take-profit, or trailing stop triggers
+   - Daily loss limit is approached
+
+
+----------------------------------------------------------------
+PART 5: HOW THE BOT TRADES
+----------------------------------------------------------------
+
+SIGNAL FLOW:
+  Source 1: LBank ticker → price momentum bullish on BTC_USDT → +2pt LONG
+  Source 2: DEX Screener → BTC trending +4% on-chain → +3pt LONG
+  Source 3: Telegram → "BTC LONG entry 65000" in channel → +4pt LONG
+                                                              ─────────
+                                                   Total: 9pt LONG ✅
+
+  Threshold is 5pt → TRADE EXECUTES as LONG BTC_USDT
+
+DYNAMIC LEVERAGE (10x minimum, 100x maximum):
+  Score 5-6  → 10x  (threshold just met — minimum leverage)
+  Score 7-8  → 25x  (moderate confidence)
+  Score 9-10 → 50x  (strong signal, 3+ sources agree)
+  Score 11-12→ 75x  (very strong)
+  Score 13+  → 100x (all 5 sources agree — maximum leverage)
+
+DIRECTION CONFLICT PROTECTION:
+  If LONG score = 6pt AND SHORT score = 5pt simultaneously
+  → bot does NOT trade (market is confused = too risky)
+
+POSITION MANAGEMENT:
+  Stop loss:        price moves 3% against you → close
+  Take profit:      price moves 6% your way → close
+  Trailing stop:    as position profits, stop moves with it
+                    (locks in gains if price reverses)
+  Liquidation guard: if margin loss hits 20% → close
+                    (prevents exchange liquidation)
+  Daily loss limit: if daily PnL drops $50 → pause for the day
+
+LEVERAGE EXAMPLES (all with $200 balance, 20% margin = $40):
+
+  10x LEVERAGE (weak signal, score 5-6):
+    Notional: $400 | BTC position at $65,000 = 0.00615 BTC
+    UP 6%:   profit = $400 × 6% = $24 on $40 margin = +60%
+    DOWN 3%: loss   = $400 × 3% = $12 on $40 margin = -30% → SL closes
+
+  50x LEVERAGE (strong signal, score 9-10):
+    Notional: $2,000 | BTC position = 0.0308 BTC
+    UP 1%:   profit = $2,000 × 1% = $20 on $40 margin = +50%
+    DOWN 0.5%: loss = $2,000 × 0.5% = $10 on $40 margin = -25% → SL closes
+    (SL auto-tightens to 0.5% at 50x to prevent liquidation)
+
+  100x LEVERAGE (all sources agree, score 13+):
+    Notional: $4,000 | BTC position = 0.0615 BTC
+    UP 0.5%: profit = $4,000 × 0.5% = $20 on $40 margin = +50%
+    DOWN 0.3%: loss = $4,000 × 0.3% = $12 on $40 margin = -30% → SL closes
+    (SL auto-tightens to 0.3% at 100x — this is scalping speed)
+    Liquidation at: 1% move against you = full margin gone
+
+  ⚠️  100x trades close VERY fast. A 1% candle wipe can liquidate
+      before the bot even gets the price update. Only happens when
+      all 5 signal sources agree simultaneously (score 13/15).
+
+
+----------------------------------------------------------------
+PART 6: ONGOING USE
+----------------------------------------------------------------
+
+DAILY COMMANDS:
+  /balance          USDT futures balance + unrealised PnL
+  /status           all open positions with live PnL
+  /history          last 10 trades
+  /sources          signal source statuses
+  /pairs            pairs being monitored
+
+MANAGING POSITIONS:
+  /close BTC_USDT   manually close a specific position
+  /close_all        close everything immediately
+
+ADDING SIGNAL SOURCES:
+  /add_channel @name    add a Telegram signal channel
+  /add_pair SOL_USDT    add a new trading pair
+  /channels             list watched channels
+
+WITHDRAWING PROFITS:
+  Withdraw directly on LBank website → Futures → Transfer
+  Move USDT from Futures wallet → Spot wallet
+  Then withdraw from spot as normal
+
+
+----------------------------------------------------------------
+RISK MANAGEMENT TIPS
+----------------------------------------------------------------
+
+START CONSERVATIVE — then scale up:
+  Week 1-2: Lower MARGIN_PERCENT to 10 (smaller positions)
+  Week 3+:  If profitable, raise to 15-20%
+
+LIMIT YOUR DAILY LOSS:
+  Set MAX_DAILY_LOSS to 10-15% of your total balance
+  Example: $200 balance → set MAX_DAILY_LOSS to 25
+
+WATCH YOUR LEVERAGE:
+  4x is already aggressive for a bot
+  If losing, consider setting LEVERAGE=2 in Railway Variables
+
+DON'T OVER-POSITION:
+  Keep MAX_POSITIONS at 2-3
+  Having 5 positions open at 4x = extremely high risk
+
+ADD QUALITY SIGNAL CHANNELS:
+  The more good Telegram futures channels you add,
+  the better the consensus quality
+  Look for channels with track records, not random groups
+
+
+----------------------------------------------------------------
+TROUBLESHOOTING
+----------------------------------------------------------------
+
+"API error: 35 Insufficient balance"?
+  → Transfer more USDT to your LBank Futures account
+  → Or lower MARGIN_PERCENT in Railway Variables
+
+"API error: 7 Invalid Session"?
+  → Your API key expired (LBank keys not bound to IP expire in 30 days)
+  → Create a new API key on LBank and update Railway Variables
+
+"API error: 8 Contract product does not exist"?
+  → The pair format is wrong — use format: BTC_USDT not BTC/USDT
+
+No trades opening?
+  → Signal threshold might not be reached
+  → Add more Telegram signal channels
+  → Lower MIN_BUY_SCORE from 5 to 4 in Railway Variables
+  → Check /sources — ensure sources are active
+
+Bot restarting repeatedly?
+  → Railway → Deployments → View Logs for the error
+  → Most common: wrong API key or wrong variable format
+
+================================================================
+   KEEP THIS FILE SAFE — all your setup instructions are here
+================================================================
